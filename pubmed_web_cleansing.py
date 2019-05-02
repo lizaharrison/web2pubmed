@@ -18,9 +18,9 @@ Database tables:
 3) pmid_web_links_full:
 4) final_links:
 
-
 """
-
+import config
+import os
 import pandas as pd
 import database_functions as db_fnc
 import retrieval_cleansing_functions as prep
@@ -29,11 +29,15 @@ from sqlalchemy import create_engine
 import numpy as np
 import itertools as it
 import pickle
-import matplotlib
-from matplotlib import pyplot as plt
-from matplotlib.ticker import ScalarFormatter
+
 
 #####
+
+
+# SET-UP
+wd = config.working_dir
+os.chdir(wd)
+
 
 # DATASET DOWNLOAD FROM DATABASE
 # Established database connection
@@ -405,6 +409,8 @@ web_data_7.columns = ['processed_content', 'url', 'pmid', 'title', 'content',
                       'pmid_count', 'url_count',
                       ]
 
+pd.to_pickle(web_data_7, 'web_data_7.pkl')
+
 #####
 
 # GENERATION OF FINAL WEB CORPUS
@@ -533,50 +539,6 @@ pmid_1_web_many = web_data_7.loc[(web_data_7['pmid_count'] == 1) & (web_data_7['
 pmid_many_web_1 = web_data_7.loc[(web_data_7['pmid_count'] > 1) & (web_data_7['url_count'] == 1)]
 
 pmid_many_web_many = web_data_7.loc[(web_data_7['pmid_count'] > 1) & (web_data_7['url_count'] > 1)]
-
-
-# VISUALISATION OF LINKS
-
-links_1 = web_data_7.set_index('url')
-links_1 = links_1.loc[:, 'pmid']
-
-pmid_per_web = links_1.value_counts()
-pmid_count_freq = pmid_per_web.value_counts()
-pmid_count_freq.sort_index(inplace=True)
-
-links_2 = web_data_7.set_index('pmid')
-links_2 = links_2.loc[:, 'url']
-
-web_per_pmid = links_2.value_counts()
-web_count_freq = web_per_pmid.value_counts()
-web_count_freq.sort_index(inplace=True)
-
-fig = plt.figure(figsize=(11, 8))
-fig.suptitle('Representation of PMIDs in web corpus')
-fig, ax = plt.subplots()
-ax.scatter(pmid_count_freq.index,
-           pmid_count_freq,
-           c='#1B4537',
-           marker='o',
-           s=4,
-           )
-ax.grid(True)
-ax.set_yscale('log')
-ax.yaxis.set_major_formatter(ScalarFormatter())
-ax.ticklabel_format(style='plain')
-plt.xlabel('Number of webpages linked to each PubMed article')
-plt.ylabel('Number of PubMed articles per webpage count')
-matplotlib.rcParams.update({'font.size': 13})
-
-plt.savefig('Figure_3.png',
-            dpi='figure',
-            )
-
-plt.show()
-
-
-#####
-
 
 # PUBMED ARTICLE AND WEB ARTICLE ONLY HAVE ONE REPORTED LINK
 final_web_corpus_1 = pmid_1_web_1

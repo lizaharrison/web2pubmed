@@ -11,6 +11,7 @@ Processing Steps:
 
 """
 
+import config
 import os
 import pandas as pd
 import retrieval_cleansing_functions as prep
@@ -27,7 +28,8 @@ today = pd.Timestamp('today').strftime('%d-%m-%y')
 # PUBMED ARTICLE RETRIEVAL #
 # DATASET IMPORT
 # Imports original list of PubMed IDs
-os.chdir('/Users/lizaharrison/PycharmProjects/web2pubmed')
+wd = config.working_dir
+os.chdir(wd)
 pmid_df = pd.read_csv('altmetric_pmids.csv',
                       header=None,
                       usecols=[0],
